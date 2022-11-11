@@ -26,7 +26,6 @@ public class TicketingDS implements TicketingSystem {
 
     Map<Long, Ticket> reservedTicketMap;
     AtomicLong nextTicketID;
-    // AtomicLong nextLineID;
     Seat[][][] seats;
 
     public TicketingDS(int routenum, int coachnum, int seatnum, int stationnum, int threadnum) {
@@ -45,7 +44,6 @@ public class TicketingDS implements TicketingSystem {
         }
 
         nextTicketID = new AtomicLong(1);
-        // nextLineID = new AtomicLong(1);
         reservedTicketMap = new HashMap<Long, Ticket>();
     }
 
@@ -56,11 +54,11 @@ public class TicketingDS implements TicketingSystem {
     }
 
     @Override
-    public synchronized int inquiry(int route, int departure, int arrival) {
+    public  int inquiry(int route, int departure, int arrival) {
 
-        // if (!verify(route, departure, arrival)) {
-        // return 0;
-        // }
+        if (!verify(route, departure, arrival)) {
+        return 0;
+        }
 
         int ans = 0;
         for (int coachIndex = 1; coachIndex <= coachNum; ++coachIndex) {
@@ -72,18 +70,15 @@ public class TicketingDS implements TicketingSystem {
             }
         }
 
-        // System.err.println("Line "+nextLineID.getAndIncrement()+  " [inquery] : ans="+ans);
         return ans;
-
     }
 
     @Override
-    public synchronized Ticket buyTicket(String passenger, int route, int departure, int arrival) {
-
-        // if (!verify(route, departure, arrival)) {
-        // return null;
-        // }
-        // nextLineID.getAndIncrement();
+    public Ticket buyTicket(String passenger, int route, int departure, int arrival) {
+        if (!verify(route, departure, arrival)) {
+        return null;
+        }
+        
         Ticket ticket = null;
         for (int coachIndex = 1; coachIndex <= coachNum; ++coachIndex) {
             for (int seatIndex = 1; seatIndex <= seatNum; ++seatIndex) {
@@ -97,9 +92,7 @@ public class TicketingDS implements TicketingSystem {
                     ticket.seat = seatIndex;
                     ticket.departure = departure;
                     ticket.arrival = arrival;
-
                     reservedTicketMap.put(ticket.tid, ticket);
-                    // System.err.println("Line "+nextLineID.getAndIncrement()+  " [buy] : ans="+ans);
                     return ticket;
                 }
             }
@@ -132,18 +125,10 @@ public class TicketingDS implements TicketingSystem {
     }
 
     @Override
-    public synchronized boolean refundTicket(Ticket ticket) {
-        // nextLineID.getAndIncrement();
-        // return true;
+    public boolean refundTicket(Ticket ticket) {
+
 
         Seat seat = seats[ticket.route][ticket.coach][ticket.seat];
-        // System.err.println("tid: " + ticket.tid);
-        // printTicket(ticket);
-        // System.err.println("check\n");
-        // printTicket(reservedTicketMap.get(ticket.tid));
         return seat.refund(ticket);
-
-        // return false;
-
     }
 }
