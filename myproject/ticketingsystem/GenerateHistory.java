@@ -243,6 +243,7 @@ public class GenerateHistory {
 					  }
 
 					  for(int j = 0; j < methodList.size(); j++){
+						
 						if(sel >= cnt && sel < cnt + freqList.get(j)){
 						  if(msec != 0 || nsec != 0){
 							try{
