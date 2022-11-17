@@ -2,7 +2,7 @@
  * @Author: starrysky9959 starrysky9651@outlook.com
  * @Date: 2022-11-10 16:29:45
  * @LastEditors: starrysky9959 starrysky9651@outlook.com
- * @LastEditTime: 2022-11-11 17:06:27
+ * @LastEditTime: 2022-11-17 20:29:37
  * @Description:  
  */
 package ticketingsystem;
@@ -54,10 +54,10 @@ public class TicketingDS implements TicketingSystem {
     }
 
     @Override
-    public  int inquiry(int route, int departure, int arrival) {
+    public synchronized int inquiry(int route, int departure, int arrival) {
 
         if (!verify(route, departure, arrival)) {
-        return 0;
+            return 0;
         }
 
         int ans = 0;
@@ -74,11 +74,11 @@ public class TicketingDS implements TicketingSystem {
     }
 
     @Override
-    public Ticket buyTicket(String passenger, int route, int departure, int arrival) {
+    public synchronized Ticket buyTicket(String passenger, int route, int departure, int arrival) {
         if (!verify(route, departure, arrival)) {
-        return null;
+            return null;
         }
-        
+
         Ticket ticket = null;
         for (int coachIndex = 1; coachIndex <= coachNum; ++coachIndex) {
             for (int seatIndex = 1; seatIndex <= seatNum; ++seatIndex) {
@@ -125,9 +125,8 @@ public class TicketingDS implements TicketingSystem {
     }
 
     @Override
-    public boolean refundTicket(Ticket ticket) {
-
-
+    public synchronized boolean refundTicket(Ticket ticket) {
+        // printTicket(ticket);
         Seat seat = seats[ticket.route][ticket.coach][ticket.seat];
         return seat.refund(ticket);
     }

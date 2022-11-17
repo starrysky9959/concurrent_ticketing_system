@@ -1,0 +1,5 @@
+ThreadNum, RefundAvgLatency(ns), BuyAvgLatency(ns), InquiryAvgLatency(ns), Throughout(TPS)
+4, 6825, 7013, 7004, 1430798
+8, 11625, 9516, 9998, 998381
+16, 18742, 16690, 17154, 582282
+64, 50547, 63252, 64018, 160149

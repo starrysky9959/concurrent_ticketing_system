@@ -2,7 +2,7 @@
  * @Author: starrysky9959 starrysky9651@outlook.com
  * @Date: 2022-11-10 16:19:13
  * @LastEditors: starrysky9959 starrysky9651@outlook.com
- * @LastEditTime: 2022-11-11 17:19:11
+ * @LastEditTime: 2022-11-17 23:36:52
  * @Description:  
 -->
 # concurrent_ticketing_system
@@ -14,6 +14,8 @@ cd <project_root_path>
 cd myproject
 sh test.sh                  # rebuild and generate history
 sh temp_very.sh             # verify the history
+sh verilin.sh               # verify linearizable
+sh benchmark.sh             # test the performance
 ```
 
 
@@ -26,3 +28,6 @@ Verification Finished.
 40ms
 VeriLin
 ```
+
+## benchmark
+update performance testing code in `Test.java`, the result is stored in the file named `result.csv`.
