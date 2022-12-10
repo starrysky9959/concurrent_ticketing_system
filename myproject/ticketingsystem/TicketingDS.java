@@ -9,7 +9,8 @@ package ticketingsystem;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /*
@@ -24,7 +25,7 @@ public class TicketingDS implements TicketingSystem {
     private final int stationNum;
     private final int threadNum;
 
-    Map<Long, Ticket> reservedTicketMap;
+    ConcurrentMap<Long, Ticket> reservedTicketMap;
     AtomicLong nextTicketID;
     Seat[][][] seats;
 
@@ -44,7 +45,7 @@ public class TicketingDS implements TicketingSystem {
         }
 
         nextTicketID = new AtomicLong(1);
-        reservedTicketMap = new HashMap<Long, Ticket>();
+        reservedTicketMap = new ConcurrentHashMap<Long, Ticket>();
     }
 
     private boolean verify(int route, int departure, int arrival) {
@@ -54,7 +55,7 @@ public class TicketingDS implements TicketingSystem {
     }
 
     @Override
-    public synchronized int inquiry(int route, int departure, int arrival) {
+    public int inquiry(int route, int departure, int arrival) {
 
         if (!verify(route, departure, arrival)) {
             return 0;
@@ -64,9 +65,11 @@ public class TicketingDS implements TicketingSystem {
         for (int coachIndex = 1; coachIndex <= coachNum; ++coachIndex) {
             for (int seatIndex = 1; seatIndex <= seatNum; ++seatIndex) {
                 Seat s = seats[route][coachIndex][seatIndex];
+                // s.lockRead();
                 if (s.available(departure, arrival)) {
                     ++ans;
                 }
+                // s.unlockRead();
             }
         }
 
@@ -74,7 +77,7 @@ public class TicketingDS implements TicketingSystem {
     }
 
     @Override
-    public synchronized Ticket buyTicket(String passenger, int route, int departure, int arrival) {
+    public Ticket buyTicket(String passenger, int route, int departure, int arrival) {
         if (!verify(route, departure, arrival)) {
             return null;
         }
@@ -83,7 +86,9 @@ public class TicketingDS implements TicketingSystem {
         for (int coachIndex = 1; coachIndex <= coachNum; ++coachIndex) {
             for (int seatIndex = 1; seatIndex <= seatNum; ++seatIndex) {
                 Seat s = seats[route][coachIndex][seatIndex];
+                // s.lockWrite();
                 if (s.buy(departure, arrival)) {
+                    // s.unlockWrite();
                     ticket = new Ticket();
                     ticket.tid = nextTicketID.getAndIncrement();
                     ticket.passenger = passenger;
@@ -95,11 +100,33 @@ public class TicketingDS implements TicketingSystem {
                     reservedTicketMap.put(ticket.tid, ticket);
                     return ticket;
                 }
+                // s.unlockWrite();
             }
         }
 
         return null;
 
+    }
+
+    @Override
+    public boolean refundTicket(Ticket ticket) {
+        // printTicket(ticket);
+
+        Seat s = seats[ticket.route][ticket.coach][ticket.seat];
+        // s.lockWrite();
+        boolean result = s.refund(ticket.departure, ticket.arrival);
+        // s.unlockWrite();
+        return result;
+    }
+
+    public void printTicket(Ticket ticket) {
+        System.err.println("-------------------\ntid: " + ticket.tid +
+                "\npassenger: " + ticket.passenger +
+                "\nroute: " + ticket.route +
+                "\ncoach: " + ticket.coach +
+                "\nseat: " + ticket.seat +
+                "\ndeparture: " + ticket.departure +
+                "\narrival: " + ticket.arrival);
     }
 
     @Override
@@ -114,20 +141,4 @@ public class TicketingDS implements TicketingSystem {
         return false;
     }
 
-    public void printTicket(Ticket ticket) {
-        System.err.println("-------------------\ntid: " + ticket.tid +
-                "\npassenger: " + ticket.passenger +
-                "\nroute: " + ticket.route +
-                "\ncoach: " + ticket.coach +
-                "\nseat: " + ticket.seat +
-                "\ndeparture: " + ticket.departure +
-                "\narrival: " + ticket.arrival);
-    }
-
-    @Override
-    public synchronized boolean refundTicket(Ticket ticket) {
-        // printTicket(ticket);
-        Seat seat = seats[ticket.route][ticket.coach][ticket.seat];
-        return seat.refund(ticket);
-    }
 }

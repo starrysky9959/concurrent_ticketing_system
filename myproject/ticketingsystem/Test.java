@@ -7,18 +7,14 @@
  */
 package ticketingsystem;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-
-import javax.naming.spi.DirStateFactory.Result;
 
 public class Test {
     enum Task {
@@ -27,11 +23,11 @@ public class Test {
         INQUERY
     }
 
-    final static int ROUTE_NUM = 3;
-    final static int COACH_NUM = 5;
-    final static int SEAT_NUM = 5;
-    final static int STATION_NUM = 10;
-    final static int PER_THREAD_TASK = 10000;
+    final static int ROUTE_NUM = 50;
+    final static int COACH_NUM = 20;
+    final static int SEAT_NUM = 100;
+    final static int STATION_NUM = 30;
+    final static int PER_THREAD_TASK = 1000000;
 
     final static int REFUND_RATIO = 10;
     final static int BUY_RATIO = 30;
@@ -159,14 +155,21 @@ public class Test {
                         if (!soldTickets.isEmpty()) {
                             int size = soldTickets.size();
                             int index = rand.nextInt(size);
-                            Ticket ticket = soldTickets.get(index);
+                            Ticket ticket = soldTickets.remove(index);
+                            if (ticket ==null){
+                                break;
+                            }
+                            // Ticket ticket = soldTickets.get(index);
                             start = System.nanoTime();
                             boolean result = tds.refundTicket(ticket);
                             end = System.nanoTime();
                             costTime = end - start;
                             refundLatency[threadID] += costTime;
+                            if (!result){
+                                System.exit(1);
+                            }
                             assert result;
-                            assert soldTickets.remove(index) != null;
+                            // assert soldTickets.remove(index) != null;
                         }
                         break;
                     case BUY:
