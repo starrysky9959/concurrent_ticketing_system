@@ -2,13 +2,14 @@
  * @Author: starrysky9959 starrysky9651@outlook.com
  * @Date: 2022-11-10 16:29:45
  * @LastEditors: starrysky9959 starrysky9651@outlook.com
- * @LastEditTime: 2022-11-17 20:29:37
+ * @LastEditTime: 2022-12-13 15:17:16
  * @Description:  
  */
 package ticketingsystem;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -17,17 +18,16 @@ import java.util.concurrent.atomic.AtomicLong;
  * 为简单起见，假设每个车次的 coachnum、seatnum 和 stationnum 都相同。车票涉及的各项参数均从 1 开始计数，例如车厢从 1 到 8 编号，车站从 1 到 10 编号等。
  */
 public class TicketingDS implements TicketingSystem {
-    // ToDo
-
     private final int routeNum;
     private final int coachNum;
     private final int seatNum;
     private final int stationNum;
     private final int threadNum;
-
-    ConcurrentMap<Long, Ticket> reservedTicketMap;
+    // private int seatSize;
+    ConcurrentHashMap<Long, Ticket> reservedTicketMap;
     AtomicLong nextTicketID;
     Seat[][][] seats;
+    // private Random seatBegin;
 
     public TicketingDS(int routenum, int coachnum, int seatnum, int stationnum, int threadnum) {
         this.routeNum = routenum;
@@ -43,7 +43,8 @@ public class TicketingDS implements TicketingSystem {
                 }
             }
         }
-
+        // seatBegin = new Random();
+        // seatSize = coachnum * seatNum;
         nextTicketID = new AtomicLong(1);
         reservedTicketMap = new ConcurrentHashMap<Long, Ticket>();
     }
@@ -65,11 +66,9 @@ public class TicketingDS implements TicketingSystem {
         for (int coachIndex = 1; coachIndex <= coachNum; ++coachIndex) {
             for (int seatIndex = 1; seatIndex <= seatNum; ++seatIndex) {
                 Seat s = seats[route][coachIndex][seatIndex];
-                // s.lockRead();
                 if (s.available(departure, arrival)) {
                     ++ans;
                 }
-                // s.unlockRead();
             }
         }
 
@@ -83,12 +82,35 @@ public class TicketingDS implements TicketingSystem {
         }
 
         Ticket ticket = null;
+
+        // int begin = seatBegin.nextInt(seatSize);
+        // int index;
+        // int coachIndex;
+        // int seatIndex;
+        // for (int i = 0; i < seatSize; ++i) {
+        // index = (begin + i) % seatSize;
+        // coachIndex = index / seatNum + 1;
+        // seatIndex = index % seatNum + 1;
+        // Seat s = seats[route][coachIndex][seatIndex];
+
+        // if (s.buy(departure, arrival)) {
+        // ticket = new Ticket();
+        // ticket.tid = nextTicketID.getAndIncrement();
+        // ticket.passenger = passenger;
+        // ticket.route = route;
+        // ticket.coach = coachIndex;
+        // ticket.seat = seatIndex;
+        // ticket.departure = departure;
+        // ticket.arrival = arrival;
+        // reservedTicketMap.put(ticket.tid, ticket);
+        // return ticket;
+        // }
+        // }
+
         for (int coachIndex = 1; coachIndex <= coachNum; ++coachIndex) {
             for (int seatIndex = 1; seatIndex <= seatNum; ++seatIndex) {
                 Seat s = seats[route][coachIndex][seatIndex];
-                // s.lockWrite();
                 if (s.buy(departure, arrival)) {
-                    // s.unlockWrite();
                     ticket = new Ticket();
                     ticket.tid = nextTicketID.getAndIncrement();
                     ticket.passenger = passenger;
@@ -100,23 +122,30 @@ public class TicketingDS implements TicketingSystem {
                     reservedTicketMap.put(ticket.tid, ticket);
                     return ticket;
                 }
-                // s.unlockWrite();
             }
         }
 
         return null;
-
     }
 
     @Override
     public boolean refundTicket(Ticket ticket) {
-        // printTicket(ticket);
-
-        Seat s = seats[ticket.route][ticket.coach][ticket.seat];
-        // s.lockWrite();
-        boolean result = s.refund(ticket.departure, ticket.arrival);
-        // s.unlockWrite();
-        return result;
+        Ticket real = reservedTicketMap.get(ticket.tid);
+        if (real != null) {
+            if ((real.tid == ticket.tid) && (real.passenger.equals(ticket.passenger)) &&
+                    (real.route == ticket.route) && (real.coach == ticket.coach)
+                    && (real.seat == ticket.seat) && (real.departure == ticket.departure)
+                    && (real.arrival == ticket.arrival)) {
+                // printTicket(ticket);
+                Seat s = seats[ticket.route][ticket.coach][ticket.seat];
+                boolean result = s.refund(ticket.departure, ticket.arrival);
+                if (result) {
+                    reservedTicketMap.remove(ticket.tid);
+                }
+                return result;
+            }
+        }
+        return false;
     }
 
     public void printTicket(Ticket ticket) {
@@ -140,5 +169,4 @@ public class TicketingDS implements TicketingSystem {
         // TODO Auto-generated method stub
         return false;
     }
-
 }

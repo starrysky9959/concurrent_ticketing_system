@@ -2,7 +2,7 @@
  * @Author: starrysky9959 starrysky9651@outlook.com
  * @Date: 2022-11-10 16:29:45
  * @LastEditors: starrysky9959 starrysky9651@outlook.com
- * @LastEditTime: 2022-11-17 23:31:37
+ * @LastEditTime: 2022-12-13 14:45:06
  * @Description:  
  */
 package ticketingsystem;
@@ -27,7 +27,7 @@ public class Test {
     final static int COACH_NUM = 20;
     final static int SEAT_NUM = 100;
     final static int STATION_NUM = 30;
-    final static int PER_THREAD_TASK = 1000000;
+    final static int PER_THREAD_TASK = 100000;
 
     final static int REFUND_RATIO = 10;
     final static int BUY_RATIO = 30;
@@ -50,8 +50,7 @@ public class Test {
         writer = new OutputStreamWriter(new FileOutputStream("result.csv"), "UTF-8");
         writer.write("ThreadNum, RefundAvgLatency(ns), BuyAvgLatency(ns), InquiryAvgLatency(ns), Throughout(TPS)\n");
 
-        System.out
-                .println();
+        System.out.println();
         for (int threadNum : THREAD_NUM_TESTCASES) {
             tds = new TicketingDS(ROUTE_NUM, COACH_NUM, ROUTE_NUM, STATION_NUM, threadNum);
             initTestCase(threadNum);
@@ -156,20 +155,14 @@ public class Test {
                             int size = soldTickets.size();
                             int index = rand.nextInt(size);
                             Ticket ticket = soldTickets.remove(index);
-                            if (ticket ==null){
+                            if (ticket == null) {
                                 break;
                             }
-                            // Ticket ticket = soldTickets.get(index);
                             start = System.nanoTime();
                             boolean result = tds.refundTicket(ticket);
                             end = System.nanoTime();
                             costTime = end - start;
                             refundLatency[threadID] += costTime;
-                            if (!result){
-                                System.exit(1);
-                            }
-                            assert result;
-                            // assert soldTickets.remove(index) != null;
                         }
                         break;
                     case BUY:
