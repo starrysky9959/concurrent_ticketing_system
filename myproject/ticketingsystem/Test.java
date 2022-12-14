@@ -2,7 +2,7 @@
  * @Author: starrysky9959 starrysky9651@outlook.com
  * @Date: 2022-11-10 16:29:45
  * @LastEditors: starrysky9959 starrysky9651@outlook.com
- * @LastEditTime: 2022-12-13 14:45:06
+ * @LastEditTime: 2022-12-14 13:05:17
  * @Description:  
  */
 package ticketingsystem;
@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -47,15 +48,18 @@ public class Test {
     static Writer writer;
 
     public static void main(String[] args) throws InterruptedException, IOException {
-        writer = new OutputStreamWriter(new FileOutputStream("result.csv"), "UTF-8");
+        writer = new OutputStreamWriter(new FileOutputStream("result.csv",true), "UTF-8");
         writer.write("ThreadNum, RefundAvgLatency(ns), BuyAvgLatency(ns), InquiryAvgLatency(ns), Throughout(TPS)\n");
 
         System.out.println();
         for (int threadNum : THREAD_NUM_TESTCASES) {
             tds = new TicketingDS(ROUTE_NUM, COACH_NUM, ROUTE_NUM, STATION_NUM, threadNum);
             initTestCase(threadNum);
+            long startTime = System.nanoTime();
             test(threadNum);
-            analyze(threadNum);
+            long endTime = System.nanoTime();
+            long totalTime = endTime-startTime;
+            analyze(threadNum, totalTime);
         }
 
         writer.close();
@@ -90,7 +94,7 @@ public class Test {
         }
     }
 
-    static void analyze(int threadNum) throws IOException {
+    static void analyze(int threadNum, long totalTime) throws IOException {
         long refundTotalLatency = 0;
         long buyTotalLatency = 0;
         long inquiryTotalLatency = 0;
@@ -105,8 +109,10 @@ public class Test {
         long inquiryAvgLatency = inquiryTotalLatency / (PER_THREAD_TASK / TOTAL_RATIO * INQUERY_RATIO * threadNum);
 
         // TPS
-        double throughout = (PER_THREAD_TASK * threadNum) * 10e9
-                / (refundTotalLatency + buyTotalLatency + inquiryTotalLatency);
+        double throughout = (PER_THREAD_TASK * threadNum) * 1000000000.0f
+                / totalTime;
+        // double throughout = (PER_THREAD_TASK * threadNum) * 10e9
+        //         / (refundTotalLatency + buyTotalLatency + inquiryTotalLatency);
         writer.write(
                 String.format("%d, %d, %d, %d, %d\n", threadNum, refundAvgLatency, buyAvgLatency, inquiryAvgLatency,
                         (long) throughout));
