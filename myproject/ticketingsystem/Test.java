@@ -2,7 +2,7 @@
  * @Author: starrysky9959 starrysky9651@outlook.com
  * @Date: 2022-11-10 16:29:45
  * @LastEditors: starrysky9959 starrysky9651@outlook.com
- * @LastEditTime: 2022-12-14 13:05:17
+ * @LastEditTime: 2022-12-16 23:16:35
  * @Description:  
  */
 package ticketingsystem;
@@ -11,7 +11,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,18 +23,18 @@ public class Test {
         INQUERY
     }
 
-    final static int ROUTE_NUM = 50;
-    final static int COACH_NUM = 20;
+    final static int ROUTE_NUM = 5;
+    final static int COACH_NUM = 8;
     final static int SEAT_NUM = 100;
-    final static int STATION_NUM = 30;
-    final static int PER_THREAD_TASK = 100000;
+    final static int STATION_NUM = 10;
+    final static int PER_THREAD_TASK = 10000;
 
     final static int REFUND_RATIO = 10;
     final static int BUY_RATIO = 30;
     final static int INQUERY_RATIO = 60;
     final static int TOTAL_RATIO = REFUND_RATIO + BUY_RATIO + INQUERY_RATIO;
 
-    final static int[] THREAD_NUM_TESTCASES = { 4, 8, 16, 32, 64 };
+    final static int[] THREAD_NUM_TESTCASES = {4,8,16,32,64 };
 
     final static Random rand = new Random();
 
@@ -111,8 +110,7 @@ public class Test {
         // TPS
         double throughout = (PER_THREAD_TASK * threadNum) * 1000000000.0f
                 / totalTime;
-        // double throughout = (PER_THREAD_TASK * threadNum) * 10e9
-        //         / (refundTotalLatency + buyTotalLatency + inquiryTotalLatency);
+                
         writer.write(
                 String.format("%d, %d, %d, %d, %d\n", threadNum, refundAvgLatency, buyAvgLatency, inquiryAvgLatency,
                         (long) throughout));

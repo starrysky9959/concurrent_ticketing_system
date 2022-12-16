@@ -2,7 +2,7 @@
  * @Author: starrysky9959 starrysky9651@outlook.com
  * @Date: 2022-11-10 16:29:45
  * @LastEditors: starrysky9959 starrysky9651@outlook.com
- * @LastEditTime: 2022-12-14 13:15:19
+ * @LastEditTime: 2022-12-16 19:48:18
  * @Description:  
  */
 package ticketingsystem;
@@ -119,61 +119,64 @@ public class TicketingDS implements TicketingSystem {
     @Override
     public Ticket buyTicket(String passenger, int route, int departure, int arrival) {
         if (!verify(route, departure, arrival)) {
+            System.err.println("[Debug]: verify failed");
             return null;
         }
 
         if (inquiryCache[route][departure][arrival].intValue() == 0) {
+            // System.err.println("[Debug]: no available ticket");
             return null;
         }
 
         Ticket ticket = null;
 
-        int begin = seatBegin.nextInt(seatSize);
-        int index;
-        int coachIndex;
-        int seatIndex;
-        for (int i = 0; i < seatSize; ++i) {
-            index = (begin + i) % seatSize;
-            coachIndex = index / seatNum + 1;
-            seatIndex = index % seatNum + 1;
-            Seat s = seats[route][coachIndex][seatIndex];
-            Result result = s.buy(departure, arrival);
-            if (result.success) {
-                ticket = new Ticket();
-                ticket.tid = nextTicketID.getAndIncrement();
-                ticket.passenger = passenger;
-                ticket.route = route;
-                ticket.coach = coachIndex;
-                ticket.seat = seatIndex;
-                ticket.departure = departure;
-                ticket.arrival = arrival;
-                reservedTicketMap.put(ticket.tid, ticket);
-                inquiryCacheDecrement(result.oldValue, result.newValue, route, departure,
-                arrival);
-                return ticket;
-            }
-        }
-
-        // for (int coachIndex = 1; coachIndex <= coachNum; ++coachIndex) {
-        //     for (int seatIndex = 1; seatIndex <= seatNum; ++seatIndex) {
-        //         Seat s = seats[route][coachIndex][seatIndex];
-        //         Result result = s.buy(departure, arrival);
-        //         if (result.success) {
-        //             ticket = new Ticket();
-        //             ticket.tid = nextTicketID.getAndIncrement();
-        //             ticket.passenger = passenger;
-        //             ticket.route = route;
-        //             ticket.coach = coachIndex;
-        //             ticket.seat = seatIndex;
-        //             ticket.departure = departure;
-        //             ticket.arrival = arrival;
-        //             reservedTicketMap.put(ticket.tid, ticket);
-        //             inquiryCacheDecrement(result.oldValue, result.newValue, route, departure,
-        //                     arrival);
-        //             return ticket;
-        //         }
+        // int begin = seatBegin.nextInt(seatSize);
+        // int index;
+        // int coachIndex;
+        // int seatIndex;
+        // for (int i = 0; i < seatSize; ++i) {
+        //     index = (begin + i) % seatSize;
+        //     coachIndex = index / seatNum + 1;
+        //     seatIndex = index % seatNum + 1;
+        //     Seat s = seats[route][coachIndex][seatIndex];
+        //     Result result = s.buy(departure, arrival);
+        //     System.err.println(result.success+", "+result.oldValue+ ", "+result.newValue);
+        //     if (result.success) {
+        //         ticket = new Ticket();
+        //         ticket.tid = nextTicketID.getAndIncrement();
+        //         ticket.passenger = passenger;
+        //         ticket.route = route;
+        //         ticket.coach = coachIndex;
+        //         ticket.seat = seatIndex;
+        //         ticket.departure = departure;
+        //         ticket.arrival = arrival;
+        //         reservedTicketMap.put(ticket.tid, ticket);
+        //         inquiryCacheDecrement(result.oldValue, result.newValue, route, departure,
+        //         arrival);
+        //         return ticket;
         //     }
         // }
+
+        for (int coachIndex = 1; coachIndex <= coachNum; ++coachIndex) {
+            for (int seatIndex = 1; seatIndex <= seatNum; ++seatIndex) {
+                Seat s = seats[route][coachIndex][seatIndex];
+                Result result = s.buy(departure, arrival);
+                if (result.success) {
+                    ticket = new Ticket();
+                    ticket.tid = nextTicketID.getAndIncrement();
+                    ticket.passenger = passenger;
+                    ticket.route = route;
+                    ticket.coach = coachIndex;
+                    ticket.seat = seatIndex;
+                    ticket.departure = departure;
+                    ticket.arrival = arrival;
+                    reservedTicketMap.put(ticket.tid, ticket);
+                    inquiryCacheDecrement(result.oldValue, result.newValue, route, departure,
+                            arrival);
+                    return ticket;
+                }
+            }
+        }
 
         return null;
     }
