@@ -2,11 +2,11 @@
  * @Author: starrysky9959 starrysky9651@outlook.com
  * @Date: 2022-11-10 16:19:13
  * @LastEditors: starrysky9959 starrysky9651@outlook.com
- * @LastEditTime: 2023-01-31 16:57:03
+ * @LastEditTime: 2023-01-31 16:58:45
  * @Description:  
 -->
 # concurrent_ticketing_system
-Reading `report.md` For more details.
+Reading [report.md](report.md) For more details.
 
 ## build
 ```
