@@ -334,3 +334,9 @@ ThreadNum, RefundAvgLatency(ns), BuyAvgLatency(ns), InquiryAvgLatency(ns), Throu
 16, 1364, 1574, 63, 2798627
 32, 398, 290, 60, 3015226
 64, 344, 325, 40, 2645062
+ThreadNum, RefundAvgLatency(ns), BuyAvgLatency(ns), InquiryAvgLatency(ns), Throughout(TPS)
+4, 2767, 2525, 114, 751780
+8, 681, 316, 69, 3800061
+16, 757, 453, 62, 2210952
+32, 699, 442, 179, 2473066
+64, 246, 284, 45, 2738515

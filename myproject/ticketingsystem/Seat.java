@@ -2,7 +2,7 @@
  * @Author: starrysky9959 starrysky9651@outlook.com
  * @Date: 2022-11-11 10:39:22
  * @LastEditors: starrysky9959 starrysky9651@outlook.com
- * @LastEditTime: 2022-12-16 23:21:10
+ * @LastEditTime: 2022-12-17 00:23:19
  * @Description:  
  */
 package ticketingsystem;
@@ -52,7 +52,6 @@ public class Seat {
             if ((oldValue & section) == section) {
                 long newValue = oldValue & (~section);
                 if (reservedStation.compareAndSet(oldValue, newValue)) {
-                    // System.err.println("[Debug]:refund op cas failed "+ i+" times");
                     return new Result(true, oldValue, newValue);
                 } else {
                     i++;

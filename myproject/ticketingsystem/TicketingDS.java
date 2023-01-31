@@ -25,7 +25,7 @@ public class TicketingDS implements TicketingSystem {
     ConcurrentHashMap<Long, Ticket> reservedTicketMap;
     AtomicLong nextTicketID;
     Seat[][][] seats;
-    private Random seatBegin;
+    // private Random seatBegin;
     private LongAdder[][][] inquiryCache;
 
     public TicketingDS(int routenum, int coachnum, int seatnum, int stationnum, int threadnum) {
@@ -42,7 +42,7 @@ public class TicketingDS implements TicketingSystem {
                 }
             }
         }
-        seatBegin = new Random();
+        // seatBegin = new Random();
         seatSize = coachnum * seatNum;
         nextTicketID = new AtomicLong(1);
         reservedTicketMap = new ConcurrentHashMap<Long, Ticket>();
@@ -71,17 +71,6 @@ public class TicketingDS implements TicketingSystem {
         }
 
         return inquiryCache[route][departure][arrival].intValue();
-
-        // int ans = 0;
-        // for (int coachIndex = 1; coachIndex <= coachNum; ++coachIndex) {
-        // for (int seatIndex = 1; seatIndex <= seatNum; ++seatIndex) {
-        // Seat s = seats[route][coachIndex][seatIndex];
-        // if (s.available(departure, arrival)) {
-        // ++ans;
-        // }
-        // }
-        // }
-        // return ans;
     }
 
     private void inquiryCacheDecrement(long oldValue, long newValue, int route, int departure, int arrival) {
@@ -124,39 +113,10 @@ public class TicketingDS implements TicketingSystem {
         }
 
         if (inquiryCache[route][departure][arrival].intValue() == 0) {
-            // System.err.println("[Debug]: no available ticket");
             return null;
         }
 
         Ticket ticket = null;
-
-        // int begin = seatBegin.nextInt(seatSize);
-        // int index;
-        // int coachIndex;
-        // int seatIndex;
-        // for (int i = 0; i < seatSize; ++i) {
-        //     index = (begin + i) % seatSize;
-        //     coachIndex = index / seatNum + 1;
-        //     seatIndex = index % seatNum + 1;
-        //     Seat s = seats[route][coachIndex][seatIndex];
-        //     Result result = s.buy(departure, arrival);
-        //     System.err.println(result.success+", "+result.oldValue+ ", "+result.newValue);
-        //     if (result.success) {
-        //         ticket = new Ticket();
-        //         ticket.tid = nextTicketID.getAndIncrement();
-        //         ticket.passenger = passenger;
-        //         ticket.route = route;
-        //         ticket.coach = coachIndex;
-        //         ticket.seat = seatIndex;
-        //         ticket.departure = departure;
-        //         ticket.arrival = arrival;
-        //         reservedTicketMap.put(ticket.tid, ticket);
-        //         inquiryCacheDecrement(result.oldValue, result.newValue, route, departure,
-        //         arrival);
-        //         return ticket;
-        //     }
-        // }
-
         for (int coachIndex = 1; coachIndex <= coachNum; ++coachIndex) {
             for (int seatIndex = 1; seatIndex <= seatNum; ++seatIndex) {
                 Seat s = seats[route][coachIndex][seatIndex];
@@ -189,7 +149,6 @@ public class TicketingDS implements TicketingSystem {
                     (real.route == ticket.route) && (real.coach == ticket.coach)
                     && (real.seat == ticket.seat) && (real.departure == ticket.departure)
                     && (real.arrival == ticket.arrival)) {
-                // printTicket(ticket);
                 Seat s = seats[ticket.route][ticket.coach][ticket.seat];
                 Result result = s.refund(ticket.departure, ticket.arrival);
                 if (result.success) {

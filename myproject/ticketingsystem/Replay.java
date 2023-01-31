@@ -160,9 +160,6 @@ public class Replay{
 		return true;
 	  } else {
 		System.out.println("Error: Ticket is bought" + " " + line.pretime + " " + line.posttime + " " + line.threadid + " " + ticket.tid + " " + ticket.passenger + " " + ticket.route + " " + ticket.coach  + " " + ticket.departure + " " + ticket.arrival + " " + ticket.seat);
-        // append
-        System.out.println("[Debug]: " + " " + line.pretime + " " + line.posttime + " " + line.threadid + " " + ticket1.tid + " " + ticket1.passenger + " " + ticket1.route + " " + ticket1.coach  + " " + ticket1.departure + " " + ticket1.arrival + " " + ticket1.seat);
-        //end
 		return false;
 	  }
 	}

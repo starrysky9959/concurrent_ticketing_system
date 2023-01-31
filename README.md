@@ -2,11 +2,11 @@
  * @Author: starrysky9959 starrysky9651@outlook.com
  * @Date: 2022-11-10 16:19:13
  * @LastEditors: starrysky9959 starrysky9651@outlook.com
- * @LastEditTime: 2022-11-17 23:36:52
+ * @LastEditTime: 2023-01-31 16:57:03
  * @Description:  
 -->
 # concurrent_ticketing_system
-UCAS concurrent final work.
+Reading `report.md` For more details.
 
 ## build
 ```
@@ -19,8 +19,8 @@ sh benchmark.sh             # test the performance
 ```
 
 
-## result
-Has passed `verilin.sh`, just use `synchroized` lock. TODO.
+## Linearizability Checking
+Has passed `verilin.sh`.
 ```
 route: 3, coach: 3, seatnum: 5, station: 5, refundRatio: 10, buyRatio: 30, inquiryRatio: 60
 history size = 3999, region size = 3999, max_region_size = 1
@@ -29,5 +29,5 @@ Verification Finished.
 VeriLin
 ```
 
-## benchmark
-update performance testing code in `Test.java`, the result is stored in the file named `result.csv`.
+## Benchmark
+Has updated performance testing code in `Test.java`, the result is stored in the file named `result.csv`.
